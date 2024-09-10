@@ -1,6 +1,6 @@
 #include "AppFrame.h"
 #include <wx/wx.h>
-
+#include <iomanip>
 
 //AppFrame Constructor. This is what the user sees.
 AppFrame::AppFrame(const wxString& title) :
@@ -82,16 +82,16 @@ void AppFrame::onceClicked(wxCommandEvent& evt) {
         // Convert the calculated distance in parsecs to light years using convertToLightYears function.
         double distanceInLightYears = convertToLightYears(distanceInParsecs);
 
+        double distanceInKm = convertToKm(distanceInParsecs);
+
      //Formats the results as a string with 6 decimal percision.
         wxString resultString = wxString::Format(
-            "Distance in Parsecs: %.6f\nDistance in Light Years: %.6f",
-            distanceInParsecs, distanceInLightYears);
+            "Distance in Parsecs: %.6f\nDistance in Km: %.3e\nDistance in Light Years: %.6f",
+            distanceInParsecs, distanceInKm, distanceInLightYears);
 
         // Update the label of the wxStaticText control (resultText) 
         //to display the formatted result string (resultString).
         //Without this, the output would not show at all.
-        //SYNTAX NOTE: resultText->SetLabe(...); in C++, is the same as 
-        //resultText.setLabel(...); in Java.
         resultText->SetLabel(resultString);
 
         //Hides the input panel and shows the result panel.

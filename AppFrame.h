@@ -72,6 +72,11 @@ public:
 		return distanceInLightYears;
 	}
 
+	double convertToKm(double distanceInParsecs) {
+		double distanceInKm = distanceInParsecs * 3.0857E+13;
+		return distanceInKm;
+	}
+
 	double luminosity(double radius, double temp) {
 		double stefanBoltzmann = 5.67e-8;
 		double pi = 3.14159265358979323846;
