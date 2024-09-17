@@ -1,4 +1,4 @@
-Stellar Distance, Luminosity, and Flux Calculator 
+Stellar Distance, Luminosity, and Flux Calculator.
 This is a cross-platform GUI application built with C++ and wxWidgets, designed to calculate the luminosity of stars based on user input of stellar distance and other factors. The application offers a clean, interactive user interface that facilitates easy input and output.
 
 Features:
