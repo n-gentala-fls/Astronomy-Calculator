@@ -14,11 +14,12 @@ AppFrame::AppFrame(const wxString& title) :
     //Explanation goes here:
     optionsPanel = new wxPanel(this, wxID_ANY);
     wxStaticText* options = new wxStaticText(optionsPanel, wxID_ANY, "What do you want to find?", wxPoint(120, 150));
-    wxButton* distance = new wxButton(optionsPanel, wxID_ANY, "Distance", wxPoint(400, 300), wxSize(100, 25));
+    wxButton* distance = new wxButton(optionsPanel, wxID_ANY, "Star Distance", wxPoint(400, 300), wxSize(100, 25));
     distance->Bind(wxEVT_BUTTON, &AppFrame::distanceEvent, this);
-    wxButton* luminosity = new wxButton(optionsPanel, wxID_ANY, "Luminosity", wxPoint(400, 250), wxSize(100, 25));
+    wxButton* luminosity = new wxButton(optionsPanel, wxID_ANY, "Star Luminosity", wxPoint(400, 250), wxSize(100, 25));
     luminosity->Bind(wxEVT_BUTTON, &AppFrame::luminosityEvent, this);
-    wxButton* na = new wxButton(optionsPanel, wxID_ANY, "Submit", wxPoint(400, 200), wxSize(100, 25));
+    wxButton* flux = new wxButton(optionsPanel, wxID_ANY, "Star Flux", wxPoint(400, 200), wxSize(100, 25));
+    flux->Bind(wxEVT_BUTTON, &AppFrame::fluxEvent, this);
 
     //Input Panel for initial view. 
 	distancePanel = new wxPanel(this, wxID_ANY);
@@ -39,12 +40,28 @@ AppFrame::AppFrame(const wxString& title) :
     radiusInput = new wxTextCtrl(luminosityPanel, wxID_ANY, "", wxPoint(250, 170), wxSize(150, -1));
     wxStaticText* kelvinPrompt = new wxStaticText(luminosityPanel, wxID_ANY, "Enter the temperature of the star in Kelvin.", wxPoint(120, 210));
     tempInput = new wxTextCtrl(luminosityPanel, wxID_ANY, "", wxPoint(250, 250), wxSize(150, -1));
-    wxButton* submit = new wxButton(luminosityPanel, wxID_ANY, "Submit", wxPoint(400, 300), wxSize(100, 25));
-    submit->Bind(wxEVT_BUTTON, &AppFrame::lumResult, this);
+    wxButton* submitLum = new wxButton(luminosityPanel, wxID_ANY, "Submit", wxPoint(400, 300), wxSize(100, 25));
+    submitLum->Bind(wxEVT_BUTTON, &AppFrame::lumResult, this);
+
+    fluxPanel = new wxPanel(this, wxID_ANY);
+    wxStaticText* luminosityPrompt = new wxStaticText(fluxPanel, wxID_ANY, "Enter the Luminosity of the star", wxPoint(120, 150));
+    luminosityInput = new wxTextCtrl(fluxPanel, wxID_ANY, "", wxPoint(250, 170), wxSize(150, -1));
+    wxStaticText* distancePrompt = new wxStaticText(fluxPanel, wxID_ANY, "Enter the distance of the star in meters.", wxPoint(120, 210));
+    distanceInput = new wxTextCtrl(fluxPanel, wxID_ANY, "", wxPoint(250, 250), wxSize(150, -1));
+    wxButton* submitFlux = new wxButton(fluxPanel, wxID_ANY, "Submit", wxPoint(400, 300), wxSize(100, 25));
+    submitFlux->Bind(wxEVT_BUTTON, &AppFrame::fluxResult, this);
+
+
+
 
     lumResultPanel = new wxPanel(this, wxID_ANY);
     lumResultPanel->Hide();
     lumResultText = new wxStaticText(resultPanel, wxID_ANY, "", wxPoint(20, 20), wxDefaultSize, wxALIGN_LEFT);
+
+    fluxResultPanel = new wxPanel(this, wxID_ANY);
+    fluxResultPanel->Hide();
+    fluxResultText = new wxStaticText(resultPanel, wxID_ANY, "", wxPoint(20, 20), wxDefaultSize, wxALIGN_LEFT);
+
 
 
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -53,6 +70,8 @@ AppFrame::AppFrame(const wxString& title) :
     sizer->Add(resultPanel, 1, wxEXPAND);
     sizer->Add(luminosityPanel, 1, wxEXPAND);
     sizer->Add(lumResultPanel, 1, wxEXPAND);
+    sizer->Add(fluxPanel, 1, wxEXPAND);
+    sizer->Add(fluxResultPanel, 1, wxEXPAND);
     SetSizer(sizer);
 
     // Ensure the options panel is shown first.
@@ -84,10 +103,12 @@ void AppFrame::onceClicked(wxCommandEvent& evt) {
 
         double distanceInKm = convertToKm(distanceInParsecs);
 
+        double distanceInM = convertToM(distanceInKm);
+
      //Formats the results as a string with 6 decimal percision.
         wxString resultString = wxString::Format(
-            "Distance in Parsecs: %.6f\nDistance in Km: %.3e\nDistance in Light Years: %.6f",
-            distanceInParsecs, distanceInKm, distanceInLightYears);
+            "Distance in Parsecs: %.6f\nDistance in Meters: %.3e\nDistance in Km: %.3e\nDistance in Light Years: %.6f",
+            distanceInParsecs, distanceInM, distanceInKm, distanceInLightYears);
 
         // Update the label of the wxStaticText control (resultText) 
         //to display the formatted result string (resultString).
@@ -131,9 +152,14 @@ void AppFrame::luminosityEvent(wxCommandEvent& evt) {
     luminosityPanel->Show();
 }
 
+void AppFrame::fluxEvent(wxCommandEvent& evt) {
+    optionsPanel->Hide();
+    fluxPanel->Show();
+}
+
 void AppFrame::lumResult(wxCommandEvent& evt) {
-    wxString radiusStr = inputTextCtrl->GetValue();
-    wxString tempStr = inputTextCtrl->GetValue();
+    wxString radiusStr = radiusInput->GetValue();
+    wxString tempStr = tempInput->GetValue();
 
     double radiusInput;
     double tempInput;
@@ -144,7 +170,7 @@ void AppFrame::lumResult(wxCommandEvent& evt) {
         double lumInSolLums = solarLuminosity(luminosityOfStar);
 
         wxString resultString = wxString::Format(
-            "Luminosity in Watts: %.6f\nLuminosity in Solar Luminosities: %.6f",
+            "Luminosity in Watts: %.3e\nLuminosity in Solar Luminosities: %.6f",
             luminosityOfStar, lumInSolLums);
 
         lumResultText->SetLabel(resultString);
@@ -159,7 +185,33 @@ void AppFrame::lumResult(wxCommandEvent& evt) {
     else {
         wxMessageBox("Invalid input. Please enter a valid number.", "Error", wxOK | wxICON_ERROR);
     }
-    
+}
+void AppFrame::fluxResult(wxCommandEvent& evt) {
+    wxString lumStr = luminosityInput->GetValue();
+    wxString disStr = distanceInput->GetValue();
+
+    double luminosityInput;
+    double distanceInput;
+    if (lumStr.ToDouble(&luminosityInput) && disStr.ToDouble(&distanceInput)) {
 
 
+        double fluxInWPSM = flux(luminosityInput, distanceInput);
+
+        wxString fluxString = wxString::Format(
+            "Flux in Watts per square meter: %.3f W/m^2",
+            fluxInWPSM);
+
+        fluxResultText->SetLabel(fluxString);
+
+        fluxPanel->Hide();
+        resultPanel->Show();
+
+        Layout();
+
+
+    }
+
+    else {
+        wxMessageBox("Invalid input. Please enter a valid number.", "Error", wxOK | wxICON_ERROR);
+    }
 }

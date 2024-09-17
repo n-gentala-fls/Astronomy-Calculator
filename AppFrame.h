@@ -6,8 +6,8 @@
 
 // Declares the AppFrame class, which inherits from wxFrame,
 // making it a type of window or frame in wxWidgets.
-class AppFrame : public wxFrame
-{
+class AppFrame : public wxFrame{
+
 
 // Declares the constructor for AppFrame
 // which takes a wxString title as an argument and initializes the frame.
@@ -25,11 +25,21 @@ public:
 public:
 	void lumResult(wxCommandEvent& evt);
 
+	void fluxResult(wxCommandEvent& evt);
+
 public:
 	void distanceEvent(wxCommandEvent& evt);
 
 public:
 	void luminosityEvent(wxCommandEvent& evt);
+
+public:
+	void fluxEvent(wxCommandEvent& evt);
+
+//public:
+	//void fluxResut(wxCommandEvent& evt);
+
+
 
 private:
 
@@ -37,10 +47,13 @@ private:
 	wxTextCtrl* inputTextCtrl;
 	wxTextCtrl* radiusInput;
 	wxTextCtrl* tempInput;
+	wxTextCtrl* luminosityInput;
+	wxTextCtrl* distanceInput;
 
 	// Declares a pointer to a wxStaticText for displaying results.
 	wxStaticText* resultText;
 	wxStaticText* lumResultText;
+	wxStaticText* fluxResultText;
 
 	//Explanation goes here:
 	wxPanel* optionsPanel;
@@ -55,6 +68,13 @@ private:
 	wxPanel* luminosityPanel;
 
 	wxPanel* lumResultPanel;
+
+	wxPanel* fluxPanel;
+
+	wxPanel* fluxResultPanel;
+
+	
+
 
 
 
@@ -77,6 +97,11 @@ public:
 		return distanceInKm;
 	}
 
+	double convertToM(double distanceInKm) {
+		double distanceInM = distanceInKm * 1000;
+		return distanceInM;
+	}
+
 	double luminosity(double radius, double temp) {
 		double stefanBoltzmann = 5.67e-8;
 		double pi = 3.14159265358979323846;
@@ -90,6 +115,13 @@ public:
 		double conversion = answer / 3.826e26;
 		return conversion;
 	}
-}
 
-;
+	double flux(double luminosity, double distance) {
+		double pi = 3.14159265358979323846;
+		double flux = luminosity / (4 * pi * (distance * distance));
+		return flux;
+	}
+};
+
+
+

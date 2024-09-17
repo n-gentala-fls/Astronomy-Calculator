@@ -17,7 +17,7 @@ bool App::OnInit() {
 	AppFrame* appFrame = new AppFrame("Star Distance Calculator");
 
 	// Sets the size of the main window's client area to 600x400 pixels.
-	appFrame->SetClientSize(600, 400);
+	appFrame->SetSizeHints(wxSize(600, 400), wxSize(600, 400));
 
 	// Centers the main window on the screen.
 	appFrame->Center();
